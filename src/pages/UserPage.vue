@@ -42,18 +42,20 @@ export default {
   data() {
     return {
       posts: [],
-      coments: [],
-      dialogVisible: false,
-      isPostsLoading: false,
-      selectedSort: '',
-      searchQuery: '',
-      page: 1,
-      limit: 10,
-      totalPages: 0,
-      sortOptions: [
-        { value: 'title', name: 'По названию' },
-        { value: 'body', name: 'По содержимому' },
-      ]
+            comments: [],
+            userAll: [],
+            dialogVisible: false,
+            isPostsLoading: false,
+            selectedSort: '',
+            searchQuery: '',
+            page: 1,
+            limit: 10,
+            totalPages: 0,
+            sortOptions: [
+                { value: 'title', name: 'At title' },
+                { value: 'body', name: 'At body' },
+            ],
+            userComment: [],
     }
   },
   methods: {
@@ -71,10 +73,10 @@ export default {
       this.page = pageNumber
     },
     async fetchPosts() {
-      try { 
-        
+      try {
+
         this.isPostsLoading = true;
-        const responseComents = await axios.get('https://jsonplaceholder.typicode.com/comments');
+        const responseComments = await axios.get('https://jsonplaceholder.typicode.com/comments');
         const response = await axios.get('https://jsonplaceholder.typicode.com/posts', {
           params: {
             _page: this.page,
@@ -83,24 +85,37 @@ export default {
         });
         this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit)
 
-        this.coments = responseComents.data;
+        this.userAll = responseComments.data;
         this.posts = response.data;
-//-----------------------------------------------------------------------------------
-this.posts.Object.passport = "123123213";
 
 
-//------------------------------------------------------------------------------------
-        
+        //-----------------------------------------------------------------------------------
+
+        this.userAll.forEach(userAll => {
+                let count = 0;
+                for (const step of this.comments) {
+                    if (userAll.userId == step.postId) {
+                        count++
+                    }
+                    console.log(count);
+                }
+                
+              })
+
+
+
+
+        //------------------------------------------------------------------------------------
+
 
       } catch (e) {
         alert('Ошибка')
       } finally {
         this.isPostsLoading = false;
 
-       
 
-        console.log(this.posts)
-        console.log(this.coments)
+       // console.log(this.posts[0]);
+        //console.log(this.posts)
       }
     },
 
@@ -122,7 +137,7 @@ this.posts.Object.passport = "123123213";
       }
     }
   },
-  
+
   mounted() {
     this.fetchPosts();
     // const options = {
