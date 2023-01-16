@@ -2,7 +2,7 @@
   <div v-if="posts.length > 0">
     <h3>Список пользователей</h3>
     <transition-group name="user-list">
-      <post-item v-for="post in posts" :post="post" @getComent="$emit('getComent', userComment)" :key="post.id" @remove="$emit('remove', post)" />
+      <post-item v-for="post in posts" :post="post" :key="post.id" @remove="$emit('remove', post)" />
     </transition-group>
   </div>
   <h2 v-else style="color: red">
@@ -19,11 +19,7 @@ export default {
       type: Array,
       required: true
     },
-    userComment:
-    {
-      type: Array,
-      required: true
-    },
+    
   }
 }
 </script>

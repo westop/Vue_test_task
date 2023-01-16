@@ -1,21 +1,19 @@
 <template>
   <div class="post">
     <div>
-      <div>{{ post.id }}</div>
-      <div><strong>Название:</strong> {{ post.title }}</div>
-      <div><strong>Описание:</strong> {{ post.body }}</div>
+      <div> <strong>Номер поста:</strong>{{ post.id }} </div>
+      <div><strong>Нейм користувача:</strong>{{ post.userId }}</div>
+      <div><strong>Кількість коментарів:</strong>{{ post.totalComment }}</div>
+      <div><strong>Заголовок:</strong> {{ post.title }}</div>
+      <div><strong>Текст:</strong> {{ post.body }}</div>
     </div>
     <div class="post__btns">
-      <my-button
-        @click="$router.push(`/posts/${post.id}`)"
-      >
+      <my-button @click="$router.push(`/posts/${post.id}`)">
         Открыть
       </my-button>
-     <my-button
-       @click="$emit('remove', post)"
-     >
-       Удалить
-     </my-button>
+      <my-button @click="$emit('remove', post)">
+        Удалить
+      </my-button>
     </div>
   </div>
 </template>
@@ -26,11 +24,6 @@ export default {
     post: {
       type: Object,
       required: true,
-    },
-    userComment:
-    {
-      type: Array,
-      required: true
     },
   }
 }
@@ -45,6 +38,7 @@ export default {
   align-items: center;
   justify-content: space-between;
 }
+
 .post__btns {
   display: flex;
 }

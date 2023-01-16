@@ -11,7 +11,7 @@
     <my-dialog v-model:show="dialogVisible">
       <post-form @create="createPost" />
     </my-dialog>
-    <post-list :posts="sortedAndSearchedPosts" @getComent="userComment" @remove="removePost" v-if="!isPostsLoading" />
+    <post-list :posts="sortedAndSearchedPosts" @remove="removePost" v-if="!isPostsLoading" />
     <div v-else>Идет загрузка...</div>
 
     <div class="page__wrapper">
@@ -20,7 +20,7 @@
       }" @click="changePage(pageNumber)">{{ pageNumber }}
       </div>
     </div>
-    <div v-if="!isPostsLoading" v-intersection="loadMorePosts" class="observer"></div>
+    
   </div>
 </template>
 
@@ -55,7 +55,8 @@ export default {
                 { value: 'title', name: 'At title' },
                 { value: 'body', name: 'At body' },
             ],
-            userComment: [],
+
+           
         }
     },
     methods: {
@@ -74,47 +75,47 @@ export default {
         },
         async fetchPosts() {
             try {
+                this.posts = [];
                 this.isPostsLoading = true;
-                const responsePosts = await axios.get('https://jsonplaceholder.typicode.com/posts', {
+                const responseUser = await axios.get('https://jsonplaceholder.typicode.com/posts', {
                     params: {
                         _page: this.page,
                         _limit: this.limit
                     }
                 });
-                this.totalPages = Math.ceil(responsePosts.headers['x-total-count'] / this.limit)
-                this.posts = responsePosts.data;
+                const responseComments = await axios.get("http://jsonplaceholder.typicode.com/comments");
+                this.comments = responseComments.data;
+
+                this.totalPages = Math.ceil(responseUser.headers['x-total-count'] / this.limit)
+                this.userAll = responseUser.data;
+
+
             } catch (e) {
                 alert('error')
             } finally {
-                this.isPostsLoading = false;
-            }
-        },
-        async getData() {
-            try {
-                const responseComments = await axios.get("http://jsonplaceholder.typicode.com/comments");
-                this.comments = responseComments.data;
-                const responseUser = await axios.get("https://jsonplaceholder.typicode.com/posts");
-                this.userAll = responseUser.data;
-            } catch (error) {
-                console.log(error);
-            }
-            this.userAll.forEach(userAll => {
+                this.userAll.forEach(userAll => {
                 let count = 0;
                 for (const step of this.comments) {
                     if (userAll.userId == step.postId) {
                         count++
-                        console.log(count)
+                        
                     }
                 }
-//this.posts[]
+
                 const obj = {
-                    user: (userAll.userId),
+                    id: (userAll.id),
+                    userId: (userAll.userId),
                     totalComment: (count),
+                    title: (userAll.title),
+                    body: (userAll.body)
                 };
-                this.userComment.push(obj)
-                this.posts[0].passports = (count)
+                
+                this.posts.push(obj);
+               
+               
             })
-           console.log(this.userComment);
+                this.isPostsLoading = false;
+            }
         },
         getComent() {
 
@@ -130,7 +131,6 @@ export default {
     },
     mounted() {
         this.fetchPosts();
-        this.getData();
     },
     computed: {
         sortedPosts() {
