@@ -13,7 +13,7 @@ export default {
     setup() {
         let map;
         onMounted(() => {
-            map = leaflet.map('map').setView([51.505, -0.09], 13);
+            map = leaflet.map('map').setView([48, 31], 6);
             leaflet.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
