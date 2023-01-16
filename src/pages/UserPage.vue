@@ -1,7 +1,10 @@
 <template>
     <div>
-        <Bar :data="$data" :options="$options" />
+
         <h1>Страница с постами</h1>
+        <Bar :data="$data" :options="$options" v-if="!isChartLoading" />
+        <div v-else>Идет загрузка...</div>
+
         <my-input v-model="searchQuery" placeholder="Поиск...." v-focus />
         <div class="app__btns">
             <my-button @click="showDialog">
@@ -62,6 +65,7 @@ export default {
             comments: [],
             userAll: [],
             dialogVisible: false,
+            isChartLoading: false,
             isPostsLoading: false,
             selectedSort: '',
             searchQuery: '',
@@ -74,8 +78,9 @@ export default {
             ],
 
 
-            labels: ['January', 'February', 'March'],
-            datasets: [{ data: [40, 20, 12] }]
+            labels: [],
+            datasets: [],
+            symvolInMail: [],
 
 
         }
@@ -94,9 +99,10 @@ export default {
         changePage(pageNumber) {
             this.page = pageNumber;
         },
-        async fetchPosts() {
+        async fetchData() {
             try {
                 this.posts = [];
+                this.isChartLoading = true;
                 this.isPostsLoading = true;
                 const responseUser = await axios.get('https://jsonplaceholder.typicode.com/posts', {
                     params: {
@@ -130,28 +136,25 @@ export default {
                         title: (userAll.title),
                         body: (userAll.body)
                     };
-
                     this.posts.push(obj);
+                });
 
-
-                })
+                this.comments.forEach(comments => {  
+                    this.labels.push(comments.id);
+                    let count = comments.email.length;
+                    this.symvolInMail.push(count);
+                });
+                const obj = {
+                        data:this.symvolInMail,
+                    };
+                this.datasets.push(obj);
+                this.isChartLoading = false;
                 this.isPostsLoading = false;
             }
         },
-        getStatistic() {
-            
-        },
-        getMassive() {
-            // this.comments.id.forEach( comments => {console.log(this.comments.postId)});
-            // this.userAll.forEach( userAll => {console.log(userAll.userId)});
-
-            //  for (const step of this.comments) {
-            //      console.log(step.postId)
-            //  }
-        }
     },
     mounted() {
-        this.fetchPosts();
+        this.fetchData();
     },
     computed: {
         sortedPosts() {
@@ -165,7 +168,7 @@ export default {
     },
     watch: {
         page() {
-            this.fetchPosts()
+            this.fetchData()
         },
 
     },
