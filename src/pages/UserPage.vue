@@ -11,7 +11,7 @@
     <my-dialog v-model:show="dialogVisible">
       <post-form @create="createPost" />
     </my-dialog>
-    <post-list :posts="sortedAndSearchedPosts" @remove="removePost" v-if="!isPostsLoading" />
+    <post-list :posts="sortedAndSearchedPosts" @getComent="userComment" @remove="removePost" v-if="!isPostsLoading" />
     <div v-else>Идет загрузка...</div>
 
     <div class="page__wrapper">
@@ -40,8 +40,8 @@ export default {
     PostList, PostForm
   },
   data() {
-    return {
-      posts: [],
+        return {
+            posts: [],
             comments: [],
             userAll: [],
             dialogVisible: false,
@@ -56,115 +56,97 @@ export default {
                 { value: 'body', name: 'At body' },
             ],
             userComment: [],
-    }
-  },
-  methods: {
-    createPost(post) {
-      this.posts.push(post);
-      this.dialogVisible = false;
+        }
     },
-    removePost(post) {
-      this.posts = this.posts.filter(p => p.id !== post.id)
-    },
-    showDialog() {
-      this.dialogVisible = true;
-    },
-    changePage(pageNumber) {
-      this.page = pageNumber
-    },
-    async fetchPosts() {
-      try {
-
-        this.isPostsLoading = true;
-        const responseComments = await axios.get('https://jsonplaceholder.typicode.com/comments');
-        const response = await axios.get('https://jsonplaceholder.typicode.com/posts', {
-          params: {
-            _page: this.page,
-            _limit: this.limit
-          }
-        });
-        this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit)
-
-        this.userAll = responseComments.data;
-        this.posts = response.data;
-
-
-        //-----------------------------------------------------------------------------------
-
-        this.userAll.forEach(userAll => {
+    methods: {
+        createPost(post) {
+            this.posts.push(post);
+            this.dialogVisible = false;
+        },
+        removePost(post) {
+            this.posts = this.posts.filter(p => p.id !== post.id)
+        },
+        showDialog() {
+            this.dialogVisible = true;
+        },
+        changePage(pageNumber) {
+            this.page = pageNumber;
+        },
+        async fetchPosts() {
+            try {
+                this.isPostsLoading = true;
+                const responsePosts = await axios.get('https://jsonplaceholder.typicode.com/posts', {
+                    params: {
+                        _page: this.page,
+                        _limit: this.limit
+                    }
+                });
+                this.totalPages = Math.ceil(responsePosts.headers['x-total-count'] / this.limit)
+                this.posts = responsePosts.data;
+            } catch (e) {
+                alert('error')
+            } finally {
+                this.isPostsLoading = false;
+            }
+        },
+        async getData() {
+            try {
+                const responseComments = await axios.get("http://jsonplaceholder.typicode.com/comments");
+                this.comments = responseComments.data;
+                const responseUser = await axios.get("https://jsonplaceholder.typicode.com/posts");
+                this.userAll = responseUser.data;
+            } catch (error) {
+                console.log(error);
+            }
+            this.userAll.forEach(userAll => {
                 let count = 0;
                 for (const step of this.comments) {
                     if (userAll.userId == step.postId) {
                         count++
+                        console.log(count)
                     }
-                    console.log(count);
                 }
-                
-              })
+//this.posts[]
+                const obj = {
+                    user: (userAll.userId),
+                    totalComment: (count),
+                };
+                this.userComment.push(obj)
+                this.posts[0].passports = (count)
+            })
+           console.log(this.userComment);
+        },
+        getComent() {
 
-
-
-
-        //------------------------------------------------------------------------------------
-
-
-      } catch (e) {
-        alert('Ошибка')
-      } finally {
-        this.isPostsLoading = false;
-
-
-       // console.log(this.posts[0]);
-        //console.log(this.posts)
-      }
+        },
+        getMassive() {
+            // this.comments.id.forEach( comments => {console.log(this.comments.postId)});
+            // this.userAll.forEach( userAll => {console.log(userAll.userId)});
+           
+            //  for (const step of this.comments) {
+            //      console.log(step.postId)
+            //  }
+        }
     },
-
-
-
-    async loadMorePosts() {
-      try {
-        this.page += 1;
-        const response = await axios.get('https://jsonplaceholder.typicode.com/posts', {
-          params: {
-            _page: this.page,
-            _limit: this.limit
-          }
-        });
-        this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit)
-        this.posts = [...this.posts, ...response.data];
-      } catch (e) {
-        alert('Ошибка')
-      }
-    }
-  },
-
-  mounted() {
-    this.fetchPosts();
-    // const options = {
-    //   rootMargin: '0px',
-    //   threshold: 1.0
-    // }
-    // const callback = (entries, observer) => {
-    //   if (entries[0].isIntersecting && this.page < this.totalPages) {
-    //     this.loadMorePosts()
-    //   }
-    // };
-    // const observer = new IntersectionObserver(callback, options);
-    // observer.observe(this.$refs.observer);
-  },
-  computed: {
-    sortedPosts() {
-      return [...this.posts].sort((post1, post2) => post1[this.selectedSort]?.localeCompare(post2[this.selectedSort]))
+    mounted() {
+        this.fetchPosts();
+        this.getData();
     },
-    sortedAndSearchedPosts() {
-      return this.sortedPosts.filter(post => post.title.toLowerCase().includes(this.searchQuery.toLowerCase()))
+    computed: {
+        sortedPosts() {
+            return [...this.posts].sort((post1, post2) =>
+                post1[this.selectedSort]?.localeCompare(post2[this.selectedSort])
+            )
+        },
+        sortedAndSearchedPosts() {
+            return this.sortedPosts.filter(post => post.title.toLowerCase().includes(this.searchQuery.toLowerCase()))
+        },
+    },
+    watch: {
+        page() {
+            this.fetchPosts()
+        }
     }
-  },
-  watch: {
-    page() {
-      this.fetchPosts()
-    }
-  }
 }
 </script>
 

@@ -26,7 +26,12 @@ export default {
     post: {
       type: Object,
       required: true,
-    }
+    },
+    userComment:
+    {
+      type: Array,
+      required: true
+    },
   }
 }
 </script>
