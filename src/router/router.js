@@ -3,13 +3,17 @@ import {createRouter, createWebHistory} from "vue-router";
 import UserPage from "@/pages/UserPage";
 import About from "@/pages/About";
 import PostIdPage from "@/pages/PostIdPage";
-
+import MapPage from "@/pages/MapPage";
 
 
 const routes = [
     {
         path: '/',
         component: Main
+    },
+    {
+        path: '/map',
+        component: MapPage
     },
     {
         path: '/posts',
