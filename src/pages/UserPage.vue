@@ -1,27 +1,28 @@
 <template>
-  <div>
-    <h1>Страница с постами</h1>
-    <my-input v-model="searchQuery" placeholder="Поиск...." v-focus />
-    <div class="app__btns">
-      <my-button @click="showDialog">
-        Создать пользователя
-      </my-button>
-      <my-select v-model="selectedSort" :options="sortOptions" />
-    </div>
-    <my-dialog v-model:show="dialogVisible">
-      <post-form @create="createPost" />
-    </my-dialog>
-    <post-list :posts="sortedAndSearchedPosts" @remove="removePost" v-if="!isPostsLoading" />
-    <div v-else>Идет загрузка...</div>
+    <div>
+        <Bar :data="$data" :options="$options" />
+        <h1>Страница с постами</h1>
+        <my-input v-model="searchQuery" placeholder="Поиск...." v-focus />
+        <div class="app__btns">
+            <my-button @click="showDialog">
+                Создать пользователя
+            </my-button>
+            <my-select v-model="selectedSort" :options="sortOptions" />
+        </div>
+        <my-dialog v-model:show="dialogVisible">
+            <post-form @create="createPost" />
+        </my-dialog>
+        <post-list :posts="sortedAndSearchedPosts" @remove="removePost" v-if="!isPostsLoading" />
+        <div v-else>Идет загрузка...</div>
 
-    <div class="page__wrapper">
-      <div v-for="pageNumber in totalPages" :key="pageNumber" class="page" :class="{
-        'current-page': page === pageNumber
-      }" @click="changePage(pageNumber)">{{ pageNumber }}
-      </div>
+        <div class="page__wrapper">
+            <div v-for="pageNumber in totalPages" :key="pageNumber" class="page" :class="{
+                'current-page': page === pageNumber
+            }" @click="changePage(pageNumber)">{{ pageNumber }}
+            </div>
+        </div>
+
     </div>
-    
-  </div>
 </template>
 
 <script>
@@ -31,15 +32,31 @@ import MyButton from "@/components/UI/MyButton";
 import axios from 'axios';
 import MySelect from "@/components/UI/MySelect";
 import MyInput from "@/components/UI/MyInput";
+import {
+    Chart as ChartJS,
+    Title,
+    Tooltip,
+    Legend,
+    BarElement,
+    CategoryScale,
+    LinearScale
+} from 'chart.js'
+import { Bar } from 'vue-chartjs'
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 export default {
-  components: {
-    MyInput,
-    MySelect,
-    MyButton,
-    PostList, PostForm
-  },
-  data() {
+    name: 'App',
+    components: {
+        MyInput,
+        MySelect,
+        MyButton,
+        PostList,
+        PostForm,
+        Bar,
+
+    },
+    data() {
         return {
             posts: [],
             comments: [],
@@ -56,7 +73,11 @@ export default {
                 { value: 'body', name: 'At body' },
             ],
 
-           
+
+            labels: ['January', 'February', 'March'],
+            datasets: [{ data: [40, 20, 12] }]
+
+
         }
     },
     methods: {
@@ -94,36 +115,36 @@ export default {
                 alert('error')
             } finally {
                 this.userAll.forEach(userAll => {
-                let count = 0;
-                for (const step of this.comments) {
-                    if (userAll.userId == step.postId) {
-                        count++
-                        
-                    }
-                }
+                    let count = 0;
+                    for (const step of this.comments) {
+                        if (userAll.userId == step.postId) {
+                            count++
 
-                const obj = {
-                    id: (userAll.id),
-                    userId: (userAll.userId),
-                    totalComment: (count),
-                    title: (userAll.title),
-                    body: (userAll.body)
-                };
-                
-                this.posts.push(obj);
-               
-               
-            })
+                        }
+                    }
+
+                    const obj = {
+                        id: (userAll.id),
+                        userId: (userAll.userId),
+                        totalComment: (count),
+                        title: (userAll.title),
+                        body: (userAll.body)
+                    };
+
+                    this.posts.push(obj);
+
+
+                })
                 this.isPostsLoading = false;
             }
         },
-        getComent() {
-
+        getStatistic() {
+            
         },
         getMassive() {
             // this.comments.id.forEach( comments => {console.log(this.comments.postId)});
             // this.userAll.forEach( userAll => {console.log(userAll.userId)});
-           
+
             //  for (const step of this.comments) {
             //      console.log(step.postId)
             //  }
@@ -145,34 +166,38 @@ export default {
     watch: {
         page() {
             this.fetchPosts()
-        }
+        },
+
+    },
+    options: {
+        responsive: true
     }
 }
 </script>
 
 <style>
 .app__btns {
-  margin: 15px 0;
-  display: flex;
-  justify-content: space-between;
+    margin: 15px 0;
+    display: flex;
+    justify-content: space-between;
 }
 
 .page__wrapper {
-  display: flex;
-  margin-top: 15px;
+    display: flex;
+    margin-top: 15px;
 }
 
 .page {
-  border: 1px solid black;
-  padding: 10px;
+    border: 1px solid black;
+    padding: 10px;
 }
 
 .current-page {
-  border: 2px solid teal;
+    border: 2px solid teal;
 }
 
 .observer {
-  height: 30px;
-  background: green;
+    height: 30px;
+    background: green;
 }
 </style>
