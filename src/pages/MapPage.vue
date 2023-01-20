@@ -1,6 +1,12 @@
 <template>
-    <div>
+    <div> 
+        
         <div id="map" @click="onMapClick"></div>
+        <my-dialog v-model:show="dialogVisible">
+           
+        </my-dialog>
+       
+        
     </div>
 </template>
 
@@ -8,8 +14,25 @@
 import L from "leaflet";
 import { onMounted, ref } from "vue";
 import axios from "axios";
+
+
+import PostForm from "@/components/PostForm";
+
 export default {
-    name: "Home",
+    name: "App",
+    
+    components: {
+        PostForm,
+    },
+    data() {
+        return{
+            dialogVisible:true,
+            
+        }
+    },
+
+
+
     setup() {
         
         onMounted(() => {
@@ -25,10 +48,12 @@ export default {
     methods:{
         onMapClick(){
             map.on('click', function(e) {
-                var marker = new L.marker([e.latlng.lat, e.latlng.lng]).addTo(map)
-                console.log(e.latlng.lat, e.latlng.lng)
+                let marker = new L.marker([e.latlng.lat, e.latlng.lng])
+                .bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup().addTo(map)
+                console.log("ok")
+                
             });
-        } 
+        } ,
     }
 
 }
