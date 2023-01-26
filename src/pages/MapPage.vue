@@ -1,103 +1,72 @@
 <template>
-    <div>
-
-        <div id="map"></div>
-        <my-dialog v-model:show="dialogVisible">
-            <my-input></my-input>
-            <my-input></my-input>
-            <my-input></my-input>
-        </my-dialog>
-
-
-    </div>
+  <l-map id="map" :zoom="zoom" :center="center" @ready="onMapReady()" @click="addMarker">
+    <l-tile-layer :url="url"></l-tile-layer>
+    <l-marker ref="marker" v-for="marker in markers" :key="marker" :lat-lng="marker.latlng">
+      <l-popup ref="popup">{{ marker.title }}</l-popup>
+    </l-marker>
+  </l-map>
 </template>
 
 <script>
-import L from "leaflet";
-import { onMounted, ref } from "vue";
-import axios from "axios";
+import "leaflet/dist/leaflet.css";
+import { LMap, LTileLayer, LMarker, LPopup } from "@vue-leaflet/vue-leaflet";
 
 
-import PostForm from "@/components/PostForm";
-import MyInput from "@/components/UI/MyInput";
 export default {
-    name: "App",
+  components: {
+    LMap,
+    LTileLayer,
+    LMarker,
+    LPopup,
+  },
+  mounted() {
 
-    components: {
-        PostForm,
-        MyInput,
+  },
+  data() {
+    return {
+      url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      zoom: 6,
+      center: [48.3794, 31.1656],
+      markers: [{
+        title: "Kharkiv",
+        latlng: [49.9935, 36.2304],
+      },
+      {
+        title: "Kyiv",
+        latlng: [50.4501, 30.5234],
+      },
+      {
+        title: "Lviv",
+        latlng: [49.8397, 24.0297],
+      },
+      ],
+    };
+  },
+  methods: {
+    onMapReady(mapObject) {
+      this.$nextTick(() => {
+        const map = this.$refs.map.leafletObject;
+      });
     },
-    data() {
-        return {
-            dialogVisible: false,
-            markers: [{
-                title: "1",
-                lat: 49.62318710125795,
-                lng: 31.68655843732102
-            },
-            {
-                title: "2",
-                lat: 48.4121615523613,
-                lng: 31.73051384182521
-            },
-            {
-                title: "3",
-                lat: 48.746682702488485,
-                lng: 36.7194522530482
-            },
-
-            ]
-
-        }
+    addMarker(event) {
+      this.markers.push({
+        latlng:event.latlng
+      });
     },
-    methods: {
-        loadMarkers() {
-            for (const item of this.markers) {
-                L.marker([item.lat, item.lng])
-                    .bindPopup(item.title).openPopup().addTo(map)
-
-            }
-            console.log("ok")
-        },
-        showDialog() {
-            this.dialogVisible = true;
-        },
-        addMarker() {
-
-            map.on('click', function (e) { 
-                //this.dialogvisible = true;
-                L.marker([e.latlng.lat, e.latlng.lng])
-                    .bindPopup("qwefgqwf").openPopup().addTo(map)
-                console.log(e.latlng);
-                //this.dialogvisible = false;
-            });
-
-            
-        },
-        
+    removeMarker(index) {
+      this.markers.splice(index, 1);
+      this.markers = this.markers.filter(i => i.latlng !== index.latlng)
     },
-    mounted() {
-        map = L.map('map').setView([48, 31], 6);
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        }).addTo(map);
-        this.loadMarkers();
-        this.addMarker();
-    },
-    watch: {
-
-
-    },
-}
+  },
+};
 </script>
 
-<style scoped>
+<style>
 #map {
-    position: fixed;
-    top: 50px;
-    left: 0;
-    width: 100%;
-    height: 100%;
+  position: fixed;
+  top: 50px;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 </style>
