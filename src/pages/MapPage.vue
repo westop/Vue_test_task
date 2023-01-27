@@ -1,15 +1,30 @@
 <template>
-  <l-map id="map" :zoom="zoom" :center="center" @ready="onMapReady()" @click="addMarker">
+
+  <l-map id="map" :zoom="zoom" :center="center" @ready="onMapReady()" @click="setupMarker">
     <l-tile-layer :url="url"></l-tile-layer>
     <l-marker ref="marker" v-for="marker in markers" :key="marker" :lat-lng="marker.latlng">
       <l-popup ref="popup">{{ marker.title }}</l-popup>
+      <l-tooltip ref="popup">{{ marker.title }}</l-tooltip>
     </l-marker>
   </l-map>
+  <my-dialog v-model:show="dialogVisible">
+    <my-input v-focus v-model="titleThis" type="text" placeholder="Title" />
+    <my-input v-model="lat" type="text" placeholder="Lat" />
+    <my-input v-model="lng" type="text" placeholder="Lng" />
+    <my-button @click="addMarker()">
+      Create marker
+    </my-button>
+  </my-dialog>
+
+  <my-button @click="createMarker()">
+    Create marker
+  </my-button>
+
 </template>
 
 <script>
 import "leaflet/dist/leaflet.css";
-import { LMap, LTileLayer, LMarker, LPopup } from "@vue-leaflet/vue-leaflet";
+import { LMap, LTileLayer, LMarker, LPopup, LTooltip } from "@vue-leaflet/vue-leaflet";
 
 
 export default {
@@ -18,6 +33,7 @@ export default {
     LTileLayer,
     LMarker,
     LPopup,
+    LTooltip,
   },
   mounted() {
 
@@ -40,6 +56,10 @@ export default {
         latlng: [49.8397, 24.0297],
       },
       ],
+      titleThis: "",
+      lat: 49.8397,
+      lng: 24.0297,
+      dialogVisible: false,
     };
   },
   methods: {
@@ -48,15 +68,32 @@ export default {
         const map = this.$refs.map.leafletObject;
       });
     },
-    addMarker(event) {
+    addMarker() {
       this.markers.push({
-        latlng:event.latlng
+        title: this.titleThis,
+        latlng: [this.lat, this.lng],
       });
+      this.dialogVisible = false;
     },
     removeMarker(index) {
       this.markers.splice(index, 1);
       this.markers = this.markers.filter(i => i.latlng !== index.latlng)
     },
+    showDialog() {
+      this.dialogVisible = true;
+    },
+    createMarker() {
+      this.titleThis = "";
+      this.lat = "";
+      this.lng = "";
+      this.showDialog();
+    },
+    setupMarker(coord) {
+      this.titleThis = "";
+      this.lat = coord.latlng.lat;
+      this.lng = coord.latlng.lng;
+      this.showDialog();
+    }
   },
 };
 </script>
@@ -64,7 +101,7 @@ export default {
 <style>
 #map {
   position: fixed;
-  top: 50px;
+  top: 115px;
   left: 0;
   width: 100%;
   height: 100%;
