@@ -1,8 +1,8 @@
 <template>
 
-  <l-map id="map" :zoom="zoom" :center="center" @ready="onMapReady()" @click="setupMarker">
+  <l-map id="map" :zoom="zoom" :center="center" @click="setupMarker">
     <l-tile-layer :url="url"></l-tile-layer>
-    <l-marker ref="marker" v-for="marker in markers" :key="marker" :lat-lng="marker.latlng">
+    <l-marker ref="marker" v-for="marker in markers" :key="marker" :lat-lng="marker.latlng" >
       <l-popup ref="popup">{{ marker.title }}</l-popup>
       <l-tooltip ref="popup">{{ marker.title }}</l-tooltip>
     </l-marker>
@@ -63,16 +63,13 @@ export default {
     };
   },
   methods: {
-    onMapReady(mapObject) {
-      this.$nextTick(() => {
-        const map = this.$refs.map.leafletObject;
-      });
-    },
+
     addMarker() {
       this.markers.push({
         title: this.titleThis,
         latlng: [this.lat, this.lng],
       });
+      localStorage.setItem('markers', JSON.stringify(this.markers))
       this.dialogVisible = false;
     },
     removeMarker(index) {
@@ -88,12 +85,20 @@ export default {
       this.lng = "";
       this.showDialog();
     },
-    setupMarker(coord) {
+    setupMarker(e) {
       this.titleThis = "";
-      this.lat = coord.latlng.lat;
-      this.lng = coord.latlng.lng;
+      this.lat = e.latlng.lat;
+      this.lng = e.latlng.lng;
       this.showDialog();
-    }
+    },
+    loadMarkersFromLocalStorage() {
+      if (localStorage.getItem('markers')) {
+        this.markers = JSON.parse(localStorage.getItem('markers'));
+      }
+    },
+  },
+  mounted() {
+    this.loadMarkersFromLocalStorage();
   },
 };
 </script>
