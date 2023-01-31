@@ -1,11 +1,11 @@
 <template>
   <div class="post">
     <div>
-      <div> <strong>Номер поста:</strong>{{ post.id }} </div>
-      <div><strong>Нейм користувача:</strong>{{ post.userId }}</div>
-      <div><strong>Кількість коментарів:</strong>{{ post.totalComment }}</div>
-      <div><strong>Заголовок:</strong> {{ post.title }}</div>
-      <div><strong>Текст:</strong> {{ post.body }}</div>
+      <div> <strong>#:</strong>{{ post.id }} </div>
+      <div><strong>Nick Name:</strong>{{ post.userId }}</div>
+      <div><strong>Total comments:</strong>{{ post.totalComment }}</div>
+      <div><strong>Title:</strong> {{ post.title }}</div>
+      <div><strong>Text:</strong> {{ post.body }}</div>
     </div>
     <div class="post__btns">
       <my-button @click="$router.push(`/posts/${post.id}`)">

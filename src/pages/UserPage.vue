@@ -1,14 +1,14 @@
 <template>
     <div>
 
-        <h1>Страница с постами</h1>
+        <h1>Post list</h1>
         <Bar :data="$data" :options="$options" v-if="!isChartLoading" />
-        <div v-else>Идет загрузка...</div>
+        <div v-else>Loading...</div>
 
-        <my-input v-model="searchQuery" placeholder="Поиск...." v-focus />
+        <my-input v-model="searchQuery" placeholder="Search...." v-focus />
         <div class="app__btns">
             <my-button @click="showDialog">
-                Создать пользователя
+                Create post
             </my-button>
             <my-select v-model="selectedSort" :options="sortOptions" />
         </div>
@@ -16,7 +16,7 @@
             <post-form @create="createPost" />
         </my-dialog>
         <post-list :posts="sortedAndSearchedPosts" @remove="removePost" v-if="!isPostsLoading" />
-        <div v-else>Идет загрузка...</div>
+        <div v-else>Loading...</div>
 
         <div class="page__wrapper">
             <div v-for="pageNumber in totalPages" :key="pageNumber" class="page" :class="{

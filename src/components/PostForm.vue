@@ -1,22 +1,22 @@
 <template>
   <form @submit.prevent>
-    <h4>Создание поста</h4>
+    <h4>Create post</h4>
     <my-input
       v-focus
       v-model="post.title"
       type="text"
-      placeholder="Название"
+      placeholder="Title"
     />
     <my-input
       v-model="post.body"
       type="text"
-      placeholder="Описание"
+      placeholder="Descryption"
     />
     <my-button
       style="align-self: flex-end; margin-top: 15px"
       @click="createPost"
     >
-      Создать
+      Create
     </my-button>
   </form>
 </template>
